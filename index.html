@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игрушки в ЖК Дубровка | Telegram бот</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Шапка */
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 30px;
+        }
+
+        .logo-text h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .logo-text p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .bot-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bot-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Основной контент */
+        .hero {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .hero-content h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .hero-content p {
+            font-size: 18px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .hero-image {
+            text-align: center;
+        }
+
+        .chat-preview {
+            background: #f5f5f5;
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        .chat-message {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .chat-message.bot {
+            flex-direction: row;
+        }
+
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-content {
+            background: white;
+            padding: 12px 18px;
+            border-radius: 18px;
+            max-width: 70%;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .bot .message-content {
+            background: #667eea;
+            color: white;
+            border-bottom-left-radius: 5px;
+        }
+
+        .user .message-content {
+            background: #e9e9e9;
+            border-bottom-right-radius: 5px;
+        }
+
+        /* Категории */
+        .categories {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .section-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #333;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .category-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+            transition: transform 0.3s;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .category-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .category-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .category-desc {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Блок выгоды */
+        .savings {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .savings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .saving-card {
+            background: linear-gradient(135deg, #f6f9fc 0%, #e6f0f5 100%);
+            border-radius: 20px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .saving-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.2);
+        }
+
+        .saving-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
+        }
+
+        .saving-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .saving-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .saving-compare {
+            margin: 15px 0;
+            padding: 10px 0;
+            border-top: 1px dashed #ccc;
+            border-bottom: 1px dashed #ccc;
+        }
+
+        .old-price {
+            font-size: 18px;
+            color: #999;
+            text-decoration: line-through;
+            margin-right: 10px;
+        }
+
+        .old-price span {
+            font-size: 14px;
+            color: #666;
+            text-decoration: none;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 12px;
+            margin-left: 8px;
+        }
+
+        .new-price {
+            font-size: 26px;
+            font-weight: 800;
+            color: #667eea;
+            margin-top: 5px;
+        }
+
+        .saving-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            transition: opacity 0.3s;
+            margin-top: 20px;
+        }
+
+        .saving-button:hover {
+            opacity: 0.9;
+        }
+
+        /* Товары */
+        .products {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            border: 1px solid #eee;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff6b6b;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 2;
+        }
+
+        .product-image {
+            height: 200px;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 48px;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .product-price-block {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .product-old-price {
+            font-size: 16px;
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .product-price {
+            font-size: 22px;
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .product-desc {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .product-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .product-button:hover {
+            opacity: 0.9;
+        }
+
+        /* Преимущества */
+        .features {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-item {
+            text-align: center;
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 30px;
+        }
+
+        .feature-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .feature-desc {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Как это работает */
+        .how-it-works {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-weight: 700;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .step-desc {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Контакты */
+        .contacts {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .contact-item {
+            padding: 20px;
+            border-radius: 15px;
+            background: #f5f5f5;
+        }
+
+        .contact-icon {
+            font-size: 30px;
+            margin-bottom: 15px;
+        }
+
+        .contact-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .contact-text {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .contact-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .contact-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Футер */
+        .footer {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-content h2 {
+                font-size: 28px;
+            }
+
+            .logo-text h1 {
+                font-size: 20px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .header, .hero, .categories, .products, .features, .how-it-works, .contacts, .savings {
+                padding: 20px;
+            }
+        }
+
+        /* Анимации */
+        .header, .hero, .categories, .products, .features, .how-it-works, .contacts, .footer, .savings {
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">🧸</div>
+                <div class="logo-text">
+                    <h1>Игрушки в ЖК Дубровка</h1>
+                    <p>Магазин детских игрушек</p>
+                </div>
+            </div>
+            <a href="https://t.me/buy_toys_bot" class="bot-link" target="_blank">
+                <span>🤖</span>
+                Открыть бота
+            </a>
+        </header>
+
+        <!-- Герой секция -->
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Покупайте игрушки через Telegram бота</h2>
+                <p>Удобный каталог, корзина покупок, доставка по ЖК Дубровка и самовывоз. Более 15 видов игрушек для детей.</p>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">15+</div>
+                        <div class="stat-label">Товаров</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">🚚</div>
+                        <div class="stat-label">Доставка по ЖК</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">🤖</div>
+                        <div class="stat-label">Telegram бот</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">-60%</div>
+                        <div class="stat-label">Скидки до 60%</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="chat-preview">
+                    <div class="chat-message bot">
+                        <div class="message-content">
+                            Привет! Я бот для покупок игрушек в ЖК Дубровка. Выберите категорию:
+                        </div>
+                    </div>
+                    <div class="chat-message user">
+                        <div class="message-content">
+                            🧸 Плюшевые игрушки
+                        </div>
+                    </div>
+                    <div class="chat-message bot">
+                        <div class="message-content">
+                            Выберите категорию:
+                            👦 Для мальчиков
+                            👧 Для девочек
+                        </div>
+                    </div>
+                    <div class="chat-message user">
+                        <div class="message-content">
+                            👧 Для девочек
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Категории -->
+        <section class="categories">
+            <h2 class="section-title">Категории товаров</h2>
+            <div class="category-grid">
+                <div class="category-card">
+                    <div class="category-icon">🧸</div>
+                    <div class="category-title">Плюшевые игрушки</div>
+                    <div class="category-desc">Мягкие игрушки для детей</div>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">👧</div>
+                    <div class="category-title">Для девочек</div>
+                    <div class="category-desc">Куклы, стичи, кисмиси</div>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">👦</div>
+                    <div class="category-title">Для мальчиков</div>
+                    <div class="category-desc">Разные игрушки для мальчиков</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Блок ВЫГОДЫ: сравнение с Wildberries -->
+        <section class="savings">
+            <h2 class="section-title">💰 Выгода до 60% — цены ниже Wildberries</h2>
+            <div class="savings-grid">
+                <!-- Розовый стич -->
+                <div class="saving-card">
+                    <div class="saving-badge">🔥 -60%</div>
+                    <div class="saving-icon">🐻</div>
+                    <div class="saving-title">Розовый стич</div>
+                    <div class="saving-compare">
+                        <span class="old-price">500 ₽ <span>Wildberries</span></span>
+                        <div class="new-price">199 ₽</div>
+                    </div>
+                    <a href="https://t.me/buy_toys_bot" class="saving-button" target="_blank">Хочу по акции</a>
+                </div>
+                <!-- Кукла говорящая -->
+                <div class="saving-card">
+                    <div class="saving-badge">🔥 -44%</div>
+                    <div class="saving-icon">🧸</div>
+                    <div class="saving-title">Кукла говорящая</div>
+                    <div class="saving-compare">
+                        <span class="old-price">899 ₽ <span>Wildberries</span></span>
+                        <div class="new-price">499 ₽</div>
+                    </div>
+                    <a href="https://t.me/buy_toys_bot" class="saving-button" target="_blank">Хочу по акции</a>
+                </div>
+                <!-- Комбо антистресс -->
+                <div class="saving-card">
+                    <div class="saving-badge">🔥 -58%</div>
+                    <div class="saving-icon">🎁</div>
+                    <div class="saving-title">Комбо антистресс</div>
+                    <div class="saving-compare">
+                        <span class="old-price">1200 ₽ <span>Wildberries</span></span>
+                        <div class="new-price">499 ₽</div>
+                    </div>
+                    <a href="https://t.me/buy_toys_bot" class="saving-button" target="_blank">Хочу по акции</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Товары (с указанием старых цен и скидок) -->
+        <section class="products">
+            <h2 class="section-title">Наши игрушки</h2>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-badge">-44%</div>
+                    <div class="product-image">🧸</div>
+                    <div class="product-info">
+                        <div class="product-name">Кукла говорящая</div>
+                        <div class="product-price-block">
+                            <span class="product-old-price">899 ₽</span>
+                            <span class="product-price">499 ₽</span>
+                        </div>
+                        <div class="product-desc">Новая, есть кнопка, разговаривает</div>
+                        <a href="https://t.me/buy_toys_bot" class="product-button" target="_blank">Купить в боте</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-badge">-60%</div>
+                    <div class="product-image">🐽</div>
+                    <div class="product-info">
+                        <div class="product-name">Розовый стич</div>
+                        <div class="product-price-block">
+                            <span class="product-old-price">500 ₽</span>
+                            <span class="product-price">199 ₽</span>
+                        </div>
+                        <div class="product-desc">Красивй с подвесткой, новый</div>
+                        <a href="https://t.me/buy_toys_bot" class="product-button" target="_blank">Купить в боте</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-badge">-38%</div>
+                    <div class="product-image">🐰</div>
+                    <div class="product-info">
+                        <div class="product-name">Кисмиси розовая</div>
+                        <div class="product-price-block">
+                            <span class="product-old-price">400 ₽</span>
+                            <span class="product-price">249 ₽</span>
+                        </div>
+                        <div class="product-desc">С ручками-липучками</div>
+                        <a href="https://t.me/buy_toys_bot" class="product-button" target="_blank">Купить в боте</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-badge">-50%</div>
+                    <div class="product-image">🐶</div>
+                    <div class="product-info">
+                        <div class="product-name">Собака белая</div>
+                        <div class="product-price-block">
+                            <span class="product-old-price">400 ₽</span>
+                            <span class="product-price">199 ₽</span>
+                        </div>
+                        <div class="product-desc">Мягкая игрушка</div>
+                        <a href="https://t.me/buy_toys_bot" class="product-button" target="_blank">Купить в боте</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-badge">-58%</div>
+                    <div class="product-image">🎁</div>
+                    <div class="product-info">
+                        <div class="product-name">Комбо антистресс</div>
+                        <div class="product-price-block">
+                            <span class="product-old-price">1200 ₽</span>
+                            <span class="product-price">499 ₽</span>
+                        </div>
+                        <div class="product-desc">Набор из 5 антистресс игрушек</div>
+                        <a href="https://t.me/buy_toys_bot" class="product-button" target="_blank">Купить в боте</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Преимущества -->
+        <section class="features">
+            <h2 class="section-title">Почему выбирают нас</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🛒</div>
+                    <div class="feature-title">Удобная корзина</div>
+                    <div class="feature-desc">Добавляйте товары в корзину и оформляйте заказ</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🚚</div>
+                    <div class="feature-title">Доставка по ЖК</div>
+                    <div class="feature-desc">Быстрая доставка по ЖК Дубровка</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">💬</div>
+                    <div class="feature-title">Поддержка</div>
+                    <div class="feature-desc">Ответим на все вопросы</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🤖</div>
+                    <div class="feature-title">Telegram бот</div>
+                    <div class="feature-desc">Весь функционал в боте</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Как это работает -->
+        <section class="how-it-works">
+            <h2 class="section-title">Как сделать заказ</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Откройте бота</div>
+                    <div class="step-desc">Нажмите кнопку "Открыть бота" и запустите его командой /start</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Выберите товары</div>
+                    <div class="step-desc">Просмотрите каталог и добавьте товары в корзину</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Оформите заказ</div>
+                    <div class="step-desc">Перейдите в корзину и выберите способ получения</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-title">Получите товар</div>
+                    <div class="step-desc">Администратор свяжется с вами</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Контакты -->
+        <section class="contacts">
+            <h2 class="section-title">Контакты</h2>
+            <div class="contacts-grid">
+                <div class="contact-item">
+                    <div class="contact-icon">📱</div>
+                    <div class="contact-title">Telegram бот</div>
+                    <div class="contact-text">@buy_toys_bot</div>
+                    <a href="https://t.me/buy_toys_bot" class="contact-link" target="_blank">Перейти</a>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">👤</div>
+                    <div class="contact-title">Администратор</div>
+                    <div class="contact-text">@Yusuf_Guseinov</div>
+                    <a href="https://t.me/Yusuf_Guseinov" class="contact-link" target="_blank">Написать</a>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">📍</div>
+                    <div class="contact-title">Адрес</div>
+                    <div class="contact-text">ЖК Дубровка</div>
+                    <div class="contact-text">Самовывоз по договоренности</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Футер -->
+        <footer class="footer">
+            <p>© 2026 Игрушки в ЖК Дубровка</p>
+            <p style="margin-top: 10px; font-size: 12px;">Работаем по предварительной договоренности</p>
+        </footer>
+    </div>
+
+    <script>
+        // Анимация при скролле
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.category-card, .product-card, .feature-item, .step, .saving-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s, transform 0.6s';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
