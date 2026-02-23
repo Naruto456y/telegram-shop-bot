@@ -161,7 +161,7 @@ def update_user_info(user):
 def read_info_plush():
     try:
         with open('info_about_toys_plush.json', 'r', encoding='utf-8') as f:
-            content = json.load(f)
+            content = json.load(f) 
         return content
     except FileNotFoundError:
         return {"toysp": []}
