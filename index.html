@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Игрушки в ЖК Дубровка | Telegram бот</title>
+    <title>🧸 Игрушки в ЖК Дубровка</title>
     <style>
         * {
             margin: 0;
@@ -19,23 +19,27 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        /* Шапка */
         .header {
             background: white;
-            border-radius: 20px;
-            padding: 20px;
+            border-radius: 30px;
+            padding: 20px 30px;
             margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 20px;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
         }
 
         .logo {
@@ -45,21 +49,29 @@
         }
 
         .logo-icon {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 30px;
+            font-size: 28px;
+            transform: rotate(-5deg);
+            transition: transform 0.3s;
+        }
+
+        .logo-icon:hover {
+            transform: rotate(0deg) scale(1.1);
         }
 
         .logo-text h1 {
             font-size: 24px;
-            color: #333;
-            margin-bottom: 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
         }
 
         .logo-text p {
@@ -67,887 +79,1091 @@
             font-size: 14px;
         }
 
-        .bot-link {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-decoration: none;
-            padding: 12px 30px;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 16px;
-            transition: transform 0.3s, box-shadow 0.3s;
-            display: inline-flex;
+        .cart-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border-radius: 50px;
+            transition: all 0.3s;
+            display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .bot-link:hover {
+        .cart-icon:hover {
+            background: #e0e0e0;
+            transform: scale(1.05);
+        }
+
+        .cart-icon span {
+            font-size: 24px;
+        }
+
+        .cart-count {
+            background: #ff6b6b;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 20px;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .cart-total {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .categories {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            background: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .category-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
         }
 
-        /* Основной контент */
-        .hero {
+        .category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .search-section {
             background: white;
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: center;
-        }
-
-        .hero-content h2 {
-            font-size: 36px;
-            margin-bottom: 20px;
-            color: #667eea;
-        }
-
-        .hero-content p {
-            font-size: 18px;
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 30px;
-        }
-
-        .hero-stats {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 28px;
-            font-weight: 700;
-            color: #667eea;
-        }
-
-        .stat-label {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .hero-image {
-            text-align: center;
-        }
-
-        .chat-preview {
-            background: #f5f5f5;
-            border-radius: 20px;
+            border-radius: 30px;
             padding: 20px;
-        }
-
-        .chat-message {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .chat-message.bot {
-            flex-direction: row;
-        }
-
-        .chat-message.user {
-            flex-direction: row-reverse;
-        }
-
-        .message-content {
-            background: white;
-            padding: 12px 18px;
-            border-radius: 18px;
-            max-width: 70%;
-            font-size: 14px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .bot .message-content {
-            background: #667eea;
-            color: white;
-            border-bottom-left-radius: 5px;
-        }
-
-        .user .message-content {
-            background: #e9e9e9;
-            border-bottom-right-radius: 5px;
-        }
-
-        /* Категории */
-        .categories {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
             margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        .section-title {
-            font-size: 28px;
-            margin-bottom: 30px;
-            text-align: center;
-            color: #333;
-        }
-
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-        }
-
-        .category-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-            padding: 30px 20px;
-            text-align: center;
-            color: white;
-            transition: transform 0.3s;
-        }
-
-        .category-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .category-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-
-        .category-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .category-desc {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        /* Блок выгоды */
-        .savings {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .savings-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-
-        .saving-card {
-            background: linear-gradient(135deg, #f6f9fc 0%, #e6f0f5 100%);
-            border-radius: 20px;
-            padding: 25px;
+        .search-box {
             position: relative;
-            overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: 1px solid rgba(102, 126, 234, 0.2);
         }
 
-        .saving-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.2);
-        }
-
-        .saving-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: #ff6b6b;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 14px;
-            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
-        }
-
-        .saving-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-
-        .saving-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .saving-compare {
-            margin: 15px 0;
-            padding: 10px 0;
-            border-top: 1px dashed #ccc;
-            border-bottom: 1px dashed #ccc;
-        }
-
-        .old-price {
-            font-size: 18px;
-            color: #999;
-            text-decoration: line-through;
-            margin-right: 10px;
-        }
-
-        .old-price span {
-            font-size: 14px;
-            color: #666;
-            text-decoration: none;
-            background: #f0f0f0;
-            padding: 2px 6px;
-            border-radius: 12px;
-            margin-left: 8px;
-        }
-
-        .new-price {
-            font-size: 26px;
-            font-weight: 800;
-            color: #667eea;
-            margin-top: 5px;
-        }
-
-        .saving-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-decoration: none;
-            padding: 12px 20px;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 16px;
-            display: inline-block;
+        .search-box input {
             width: 100%;
-            text-align: center;
-            transition: opacity 0.3s;
-            margin-top: 20px;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid #f0f0f0;
+            border-radius: 50px;
+            font-size: 16px;
+            transition: all 0.3s;
         }
 
-        .saving-button:hover {
-            opacity: 0.9;
+        .search-box input:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.1);
         }
 
-        /* Товары */
-        .products {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        .search-box span {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: #999;
         }
 
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
         }
 
         .product-card {
-            border: 1px solid #eee;
-            border-radius: 15px;
+            background: white;
+            border-radius: 30px;
             overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             position: relative;
         }
 
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 50px rgba(102, 126, 234, 0.3);
         }
 
-        .product-badge {
+        .product-gallery {
+            position: relative;
+            height: 280px;
+            background: linear-gradient(145deg, #f8f0ff 0%, #efe6ff 100%);
+            overflow: hidden;
+        }
+
+        .gallery-container {
+            display: flex;
+            height: 100%;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-slide {
+            flex: 0 0 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .gallery-slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 20px rgba(102, 126, 234, 0.3));
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover .gallery-slide img {
+            transform: scale(1.05);
+        }
+
+        .gallery-nav {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            z-index: 2;
+        }
+
+        .gallery-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .gallery-dot.active {
+            background: #667eea;
+            transform: scale(1.3);
+            box-shadow: 0 0 10px #667eea;
+        }
+
+        .gallery-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #667eea;
+            transition: all 0.3s;
+            z-index: 2;
+            opacity: 0;
+        }
+
+        .product-card:hover .gallery-arrow {
+            opacity: 0.8;
+        }
+
+        .gallery-arrow:hover {
+            opacity: 1 !important;
+            background: #667eea;
+            color: white;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .gallery-arrow.left {
+            left: 5px;
+        }
+
+        .gallery-arrow.right {
+            right: 5px;
+        }
+
+        .product-info {
+            padding: 25px;
+        }
+
+        .product-category {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #f0f0f0;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .product-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .product-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            min-height: 60px;
+        }
+
+        .product-price-block {
+            background: #f8f8f8;
+            border-radius: 20px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .price-current {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .add-to-cart-btn {
+            flex: 1;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .add-to-cart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .remove-from-cart-btn {
+            flex: 1;
+            padding: 12px;
             background: #ff6b6b;
             color: white;
-            padding: 4px 10px;
-            border-radius: 20px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .remove-from-cart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f0f0f0;
+            border-radius: 50px;
+            padding: 5px;
+        }
+
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 50%;
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quantity-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .quantity-value {
+            font-weight: 600;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .in-cart-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 50px;
             font-size: 12px;
             font-weight: 600;
             z-index: 2;
         }
 
-        .product-image {
-            height: 200px;
-            background: #f5f5f5;
+        .cart-section {
+            background: white;
+            border-radius: 30px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .cart-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cart-empty {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+        }
+
+        .cart-empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: #f8f8f8;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            transition: transform 0.3s;
+        }
+
+        .cart-item:hover {
+            transform: translateX(5px);
+        }
+
+        .cart-item-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex: 2;
+        }
+
+        .cart-item-image {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #999;
-            font-size: 48px;
+            overflow: hidden;
         }
 
-        .product-info {
-            padding: 20px;
+        .cart-item-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
         }
 
-        .product-name {
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-name {
             font-size: 18px;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             color: #333;
         }
 
-        .product-price-block {
-            display: flex;
-            align-items: baseline;
-            gap: 10px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
-
-        .product-old-price {
-            font-size: 16px;
-            color: #999;
-            text-decoration: line-through;
-        }
-
-        .product-price {
-            font-size: 22px;
+        .cart-item-price {
             color: #667eea;
+            font-weight: 600;
+        }
+
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: white;
+            padding: 8px 15px;
+            border-radius: 50px;
+            margin: 0 20px;
+        }
+
+        .cart-item-total {
+            font-size: 20px;
             font-weight: 700;
+            color: #333;
+            min-width: 100px;
+            text-align: right;
         }
 
-        .product-desc {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-
-        .product-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .cart-item-remove {
+            background: #ff6b6b;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: opacity 0.3s;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .product-button:hover {
-            opacity: 0.9;
-        }
-
-        /* Преимущества */
-        .features {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-
-        .feature-item {
-            text-align: center;
-        }
-
-        .feature-icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            color: white;
-            font-size: 30px;
-        }
-
-        .feature-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .feature-desc {
-            color: #666;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        /* Как это работает */
-        .how-it-works {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-            margin-top: 30px;
-        }
-
-        .step {
-            text-align: center;
-            position: relative;
-        }
-
-        .step-number {
             width: 40px;
             height: 40px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
-            color: white;
-            font-weight: 700;
         }
 
-        .step-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #333;
+        .cart-item-remove:hover {
+            transform: scale(1.1);
+            background: #ff5252;
         }
 
-        .step-desc {
-            color: #666;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        /* Контакты */
-        .contacts {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            text-align: center;
-        }
-
-        .contacts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
+        .cart-summary {
             margin-top: 30px;
-        }
-
-        .contact-item {
             padding: 20px;
-            border-radius: 15px;
-            background: #f5f5f5;
+            background: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
-        .contact-icon {
-            font-size: 30px;
-            margin-bottom: 15px;
-        }
-
-        .contact-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .contact-text {
+        .cart-total-label {
+            font-size: 20px;
             color: #666;
-            font-size: 16px;
-            margin-bottom: 10px;
         }
 
-        .contact-link {
-            color: #667eea;
-            text-decoration: none;
+        .cart-total-amount {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .checkout-btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
             font-weight: 600;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .contact-link:hover {
-            text-decoration: underline;
+        .checkout-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(76, 175, 80, 0.3);
         }
 
-        /* Футер */
+        .clear-cart-btn {
+            padding: 15px 30px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .clear-cart-btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 15px;
+            padding: 15px 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
         .footer {
             background: white;
-            border-radius: 20px;
+            border-radius: 30px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             text-align: center;
             color: #666;
             font-size: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        /* Адаптивность */
+        .footer p:first-child {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
         @media (max-width: 768px) {
-            .hero {
-                grid-template-columns: 1fr;
-            }
-
-            .hero-content h2 {
-                font-size: 28px;
-            }
-
-            .logo-text h1 {
-                font-size: 20px;
-            }
-
-            .container {
-                padding: 10px;
-            }
-
-            .header, .hero, .categories, .products, .features, .how-it-works, .contacts, .savings {
-                padding: 20px;
-            }
-        }
-
-        /* Анимации */
-        .header, .hero, .categories, .products, .features, .how-it-works, .contacts, .footer, .savings {
-            animation: fadeIn 1s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            .container { padding: 10px; }
+            .header { padding: 15px; }
+            .logo-icon { width: 40px; height: 40px; font-size: 20px; }
+            .logo-text h1 { font-size: 18px; }
+            .cart-item { flex-direction: column; gap: 15px; }
+            .cart-item-info { width: 100%; }
+            .cart-item-quantity { margin: 10px 0; }
+            .cart-summary { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Шапка -->
         <header class="header">
             <div class="logo">
                 <div class="logo-icon">🧸</div>
                 <div class="logo-text">
-                    <h1>Игрушки в ЖК Дубровка</h1>
-                    <p>Магазин детских игрушек</p>
+                    <h1>ЖК Дубровка</h1>
+                    <p>Магазин игрушек</p>
                 </div>
             </div>
-            <a href="https://t.me/buy_toys_bot" class="bot-link" target="_blank">
-                <span>🤖</span>
-                Открыть бота
-            </a>
+            <div class="cart-header">
+                <div class="cart-icon" onclick="toggleCart()">
+                    <span>🛒</span>
+                    <span class="cart-count" id="cartCount">0</span>
+                    <span class="cart-total" id="cartTotal">0 ₽</span>
+                </div>
+            </div>
         </header>
 
-        <!-- Герой секция -->
-        <section class="hero">
-            <div class="hero-content">
-                <h2>Покупайте игрушки через Telegram бота</h2>
-                <p>Удобный каталог, корзина покупок, доставка по ЖК Дубровка и самовывоз. Более 15 видов игрушек для детей.</p>
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <div class="stat-number">15+</div>
-                        <div class="stat-label">Товаров</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">🚚</div>
-                        <div class="stat-label">Доставка по ЖК</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">🤖</div>
-                        <div class="stat-label">Telegram бот</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">-60%</div>
-                        <div class="stat-label">Скидки до 60%</div>
-                    </div>
-                </div>
-            </div>
-            <div class="hero-image">
-                <div class="chat-preview">
-                    <div class="chat-message bot">
-                        <div class="message-content">
-                            Привет! Я бот для покупок игрушек в ЖК Дубровка. Выберите категорию:
-                        </div>
-                    </div>
-                    <div class="chat-message user">
-                        <div class="message-content">
-                            🧸 Плюшевые игрушки
-                        </div>
-                    </div>
-                    <div class="chat-message bot">
-                        <div class="message-content">
-                            Выберите категорию:
-                            👦 Для мальчиков
-                            👧 Для девочек
-                        </div>
-                    </div>
-                    <div class="chat-message user">
-                        <div class="message-content">
-                            👧 Для девочек
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <div class="categories">
+            <button class="category-btn active" onclick="filterToys('all')">
+                <span>🏠</span> Все
+            </button>
+            <button class="category-btn" onclick="filterToys('plush')">
+                <span>🧸</span> Плюшевые
+            </button>
+            <button class="category-btn" onclick="filterToys('simple')">
+                <span>🎲</span> Обычные
+            </button>
+        </div>
 
-        <!-- Категории -->
-        <section class="categories">
-            <h2 class="section-title">Категории товаров</h2>
-            <div class="category-grid">
-                <div class="category-card">
-                    <div class="category-icon">🧸</div>
-                    <div class="category-title">Плюшевые игрушки</div>
-                    <div class="category-desc">Мягкие игрушки для детей</div>
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Поиск игрушек..." oninput="searchToys()">
+                <span>🔍</span>
+            </div>
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+        </div>
+
+        <div class="cart-section" id="cartSection" style="display: none;">
+            <h2 class="cart-title">
+                <span>🛒</span> Ваша корзина
+            </h2>
+            <div id="cartItems"></div>
+            <div class="cart-summary">
+                <div>
+                    <span class="cart-total-label">Итого:</span>
+                    <span class="cart-total-amount" id="cartTotalAmount">0 ₽</span>
                 </div>
-                <div class="category-card">
-                    <div class="category-icon">👧</div>
-                    <div class="category-title">Для девочек</div>
-                    <div class="category-desc">Куклы, стичи, кисмиси</div>
-                </div>
-                <div class="category-card">
-                    <div class="category-icon">👦</div>
-                    <div class="category-title">Для мальчиков</div>
-                    <div class="category-desc">Разные игрушки для мальчиков</div>
+                <div style="display: flex; gap: 15px;">
+                    <button class="clear-cart-btn" onclick="clearCart()">
+                        🗑 Очистить
+                    </button>
+                    <button class="checkout-btn" onclick="checkout()">
+                        🤖 Оформить в боте
+                    </button>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Блок ВЫГОДЫ: сравнение с Wildberries -->
-        <section class="savings">
-            <h2 class="section-title">💰 Выгода до 60% — цены ниже Wildberries</h2>
-            <div class="savings-grid">
-                <!-- Розовый стич -->
-                <div class="saving-card">
-                    <div class="saving-badge">🔥 -60%</div>
-                    <div class="saving-icon">🐻</div>
-                    <div class="saving-title">Розовый стич</div>
-                    <div class="saving-compare">
-                        <span class="old-price">500 ₽ <span>Wildberries</span></span>
-                        <div class="new-price">199 ₽</div>
-                    </div>
-                    <a href="https://t.me/buy_toys_bot" class="saving-button" target="_blank">Хочу по акции</a>
-                </div>
-                <!-- Кукла говорящая -->
-                <div class="saving-card">
-                    <div class="saving-badge">🔥 -44%</div>
-                    <div class="saving-icon">🧸</div>
-                    <div class="saving-title">Кукла говорящая</div>
-                    <div class="saving-compare">
-                        <span class="old-price">899 ₽ <span>Wildberries</span></span>
-                        <div class="new-price">499 ₽</div>
-                    </div>
-                    <a href="https://t.me/buy_toys_bot" class="saving-button" target="_blank">Хочу по акции</a>
-                </div>
-                <!-- Комбо антистресс -->
-                <div class="saving-card">
-                    <div class="saving-badge">🔥 -58%</div>
-                    <div class="saving-icon">🎁</div>
-                    <div class="saving-title">Комбо антистресс</div>
-                    <div class="saving-compare">
-                        <span class="old-price">1200 ₽ <span>Wildberries</span></span>
-                        <div class="new-price">499 ₽</div>
-                    </div>
-                    <a href="https://t.me/buy_toys_bot" class="saving-button" target="_blank">Хочу по акции</a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Товары (с указанием старых цен и скидок) -->
-        <section class="products">
-            <h2 class="section-title">Наши игрушки</h2>
-            <div class="products-grid">
-                <div class="product-card">
-                    <div class="product-badge">-44%</div>
-                    <div class="product-image">🧸</div>
-                    <div class="product-info">
-                        <div class="product-name">Кукла говорящая</div>
-                        <div class="product-price-block">
-                            <span class="product-old-price">899 ₽</span>
-                            <span class="product-price">499 ₽</span>
-                        </div>
-                        <div class="product-desc">Новая, есть кнопка, разговаривает</div>
-                        <a href="https://t.me/buy_toys_bot" class="product-button" target="_blank">Купить в боте</a>
-                    </div>
-                </div>
-                <div class="product-card">
-                    <div class="product-badge">-60%</div>
-                    <div class="product-image">🐽</div>
-                    <div class="product-info">
-                        <div class="product-name">Розовый стич</div>
-                        <div class="product-price-block">
-                            <span class="product-old-price">500 ₽</span>
-                            <span class="product-price">199 ₽</span>
-                        </div>
-                        <div class="product-desc">Красивй с подвесткой, новый</div>
-                        <a href="https://t.me/buy_toys_bot" class="product-button" target="_blank">Купить в боте</a>
-                    </div>
-                </div>
-                <div class="product-card">
-                    <div class="product-badge">-38%</div>
-                    <div class="product-image">🐰</div>
-                    <div class="product-info">
-                        <div class="product-name">Кисмиси розовая</div>
-                        <div class="product-price-block">
-                            <span class="product-old-price">400 ₽</span>
-                            <span class="product-price">249 ₽</span>
-                        </div>
-                        <div class="product-desc">С ручками-липучками</div>
-                        <a href="https://t.me/buy_toys_bot" class="product-button" target="_blank">Купить в боте</a>
-                    </div>
-                </div>
-                <div class="product-card">
-                    <div class="product-badge">-50%</div>
-                    <div class="product-image">🐶</div>
-                    <div class="product-info">
-                        <div class="product-name">Собака белая</div>
-                        <div class="product-price-block">
-                            <span class="product-old-price">400 ₽</span>
-                            <span class="product-price">199 ₽</span>
-                        </div>
-                        <div class="product-desc">Мягкая игрушка</div>
-                        <a href="https://t.me/buy_toys_bot" class="product-button" target="_blank">Купить в боте</a>
-                    </div>
-                </div>
-                <div class="product-card">
-                    <div class="product-badge">-58%</div>
-                    <div class="product-image">🎁</div>
-                    <div class="product-info">
-                        <div class="product-name">Комбо антистресс</div>
-                        <div class="product-price-block">
-                            <span class="product-old-price">1200 ₽</span>
-                            <span class="product-price">499 ₽</span>
-                        </div>
-                        <div class="product-desc">Набор из 5 антистресс игрушек</div>
-                        <a href="https://t.me/buy_toys_bot" class="product-button" target="_blank">Купить в боте</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Преимущества -->
-        <section class="features">
-            <h2 class="section-title">Почему выбирают нас</h2>
-            <div class="features-grid">
-                <div class="feature-item">
-                    <div class="feature-icon">🛒</div>
-                    <div class="feature-title">Удобная корзина</div>
-                    <div class="feature-desc">Добавляйте товары в корзину и оформляйте заказ</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">🚚</div>
-                    <div class="feature-title">Доставка по ЖК</div>
-                    <div class="feature-desc">Быстрая доставка по ЖК Дубровка</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">💬</div>
-                    <div class="feature-title">Поддержка</div>
-                    <div class="feature-desc">Ответим на все вопросы</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">🤖</div>
-                    <div class="feature-title">Telegram бот</div>
-                    <div class="feature-desc">Весь функционал в боте</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Как это работает -->
-        <section class="how-it-works">
-            <h2 class="section-title">Как сделать заказ</h2>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-title">Откройте бота</div>
-                    <div class="step-desc">Нажмите кнопку "Открыть бота" и запустите его командой /start</div>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-title">Выберите товары</div>
-                    <div class="step-desc">Просмотрите каталог и добавьте товары в корзину</div>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-title">Оформите заказ</div>
-                    <div class="step-desc">Перейдите в корзину и выберите способ получения</div>
-                </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <div class="step-title">Получите товар</div>
-                    <div class="step-desc">Администратор свяжется с вами</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Контакты -->
-        <section class="contacts">
-            <h2 class="section-title">Контакты</h2>
-            <div class="contacts-grid">
-                <div class="contact-item">
-                    <div class="contact-icon">📱</div>
-                    <div class="contact-title">Telegram бот</div>
-                    <div class="contact-text">@buy_toys_bot</div>
-                    <a href="https://t.me/buy_toys_bot" class="contact-link" target="_blank">Перейти</a>
-                </div>
-                <div class="contact-item">
-                    <div class="contact-icon">👤</div>
-                    <div class="contact-title">Администратор</div>
-                    <div class="contact-text">@Yusuf_Guseinov</div>
-                    <a href="https://t.me/Yusuf_Guseinov" class="contact-link" target="_blank">Написать</a>
-                </div>
-                <div class="contact-item">
-                    <div class="contact-icon">📍</div>
-                    <div class="contact-title">Адрес</div>
-                    <div class="contact-text">ЖК Дубровка</div>
-                    <div class="contact-text">Самовывоз по договоренности</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Футер -->
         <footer class="footer">
-            <p>© 2026 Игрушки в ЖК Дубровка</p>
-            <p style="margin-top: 10px; font-size: 12px;">Работаем по предварительной договоренности</p>
+            <p>🧸 Игрушки в ЖК Дубровка</p>
+            <p>© 2026 Магазин детских игрушек</p>
+            <p style="font-size: 12px; margin-top: 10px;">💵 Оплата только наличными</p>
         </footer>
     </div>
 
     <script>
-        // Анимация при скролле
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
+        let allToys = [];
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let currentFilter = 'all';
+        let searchQuery = '';
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
+        const BOT_USERNAME = 'buy_toys_bot';
+
+        async function loadToys() {
+            try {
+                console.log('🔍 Загрузка игрушек...');
+                
+                const plushUrl = 'info_about_toys_plush.json?t=' + Date.now();
+                const plushResponse = await fetch(plushUrl);
+
+                if (plushResponse.ok) {
+                    const plushData = await plushResponse.json();
+                    
+                    if (plushData.toysp && Array.isArray(plushData.toysp)) {
+                        plushData.toysp.forEach(toyObj => {
+                            const toyKey = Object.keys(toyObj)[0];
+                            const toy = toyObj[toyKey];
+                            
+                            if (toy) {
+                                const price = parseInt(toy.price) || 0;
+                                
+                                allToys.push({
+                                    id: toyKey,
+                                    name: toy.name || 'Без названия',
+                                    price: price,
+                                    description: toy.about || 'Нет описания',
+                                    category: 'plush',
+                                    images: Array.isArray(toy.img) ? toy.img : (toy.img ? [toy.img] : [])
+                                });
+                            }
+                        });
+                    }
                 }
-            });
-        }, observerOptions);
 
-        document.querySelectorAll('.category-card, .product-card, .feature-item, .step, .saving-card').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(20px)';
-            el.style.transition = 'opacity 0.6s, transform 0.6s';
-            observer.observe(el);
+                try {
+                    const simpleUrl = 'info_about_toys_simple.json?t=' + Date.now();
+                    const simpleResponse = await fetch(simpleUrl);
+                    if (simpleResponse.ok) {
+                        const simpleData = await simpleResponse.json();
+                        if (simpleData.toysp && Array.isArray(simpleData.toysp)) {
+                            simpleData.toysp.forEach(toyObj => {
+                                const toyKey = Object.keys(toyObj)[0];
+                                const toy = toyObj[toyKey];
+                                if (toy) {
+                                    const price = parseInt(toy.price) || 0;
+                                    allToys.push({
+                                        id: toyKey,
+                                        name: toy.name || 'Без названия',
+                                        price: price,
+                                        description: toy.about || 'Нет описания',
+                                        category: 'simple',
+                                        images: Array.isArray(toy.img) ? toy.img : (toy.img ? [toy.img] : [])
+                                    });
+                                }
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.log('Нет файла с обычными игрушками или ошибка загрузки');
+                }
+
+                console.log('✅ Загружено игрушек:', allToys.length);
+                renderToys();
+                updateCartDisplay();
+                
+            } catch (error) {
+                console.error('❌ Ошибка загрузки:', error);
+                allToys = [
+                    { id: 'test1', name: 'Розовый стич', price: 199, description: 'Новая в хорошем качестве, с подвеской', category: 'plush', images: [] },
+                    { id: 'test2', name: 'Кисимиси розовая', price: 249, description: 'Новая в хорошем качестве, с ручками липучками', category: 'plush', images: [] },
+                    { id: 'test3', name: 'Собака белая', price: 199, description: 'Новая в хорошем качестве', category: 'plush', images: [] }
+                ];
+                renderToys();
+            }
+        }
+
+        function nextImage(toyId, currentIndex) {
+            const toy = allToys.find(t => t.id === toyId);
+            if (!toy || !toy.images || toy.images.length <= 1) return;
+            
+            const newIndex = (parseInt(currentIndex) + 1) % toy.images.length;
+            updateGallery(toyId, newIndex);
+        }
+
+        function prevImage(toyId, currentIndex) {
+            const toy = allToys.find(t => t.id === toyId);
+            if (!toy || !toy.images || toy.images.length <= 1) return;
+            
+            const newIndex = (parseInt(currentIndex) - 1 + toy.images.length) % toy.images.length;
+            updateGallery(toyId, newIndex);
+        }
+
+        function updateGallery(toyId, index) {
+            const container = document.getElementById(`gallery-${toyId}`);
+            if (container) {
+                container.style.transform = `translateX(-${index * 100}%)`;
+                container.dataset.currentIndex = index;
+            }
+            
+            document.querySelectorAll(`.dot-${toyId}`).forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        }
+
+        function goToSlide(toyId, index) {
+            updateGallery(toyId, index);
+        }
+
+        function addToCart(toyId) {
+            const toy = allToys.find(t => t.id === toyId);
+            if (!toy) return;
+
+            const existingItem = cart.find(item => item.id === toyId);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: toy.id,
+                    name: toy.name,
+                    price: toy.price,
+                    quantity: 1,
+                    category: toy.category,
+                    image: toy.images && toy.images.length > 0 ? toy.images[0] : null
+                });
+            }
+
+            saveCart();
+            updateCartDisplay();
+            showNotification(`✅ ${toy.name} добавлен в корзину`);
+        }
+
+        function removeFromCart(toyId) {
+            const index = cart.findIndex(item => item.id === toyId);
+            if (index !== -1) {
+                const toyName = cart[index].name;
+                cart.splice(index, 1);
+                saveCart();
+                updateCartDisplay();
+                showNotification(`❌ ${toyName} удален из корзины`);
+            }
+        }
+
+        function updateQuantity(toyId, change) {
+            const item = cart.find(item => item.id === toyId);
+            if (!item) return;
+
+            item.quantity += change;
+            
+            if (item.quantity <= 0) {
+                removeFromCart(toyId);
+            } else {
+                saveCart();
+                updateCartDisplay();
+            }
+        }
+
+        function clearCart() {
+            if (cart.length === 0) return;
+            
+            if (confirm('Очистить корзину?')) {
+                cart = [];
+                saveCart();
+                updateCartDisplay();
+                showNotification('🗑 Корзина очищена');
+            }
+        }
+
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        function getCartTotal() {
+            return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        }
+
+        function getCartCount() {
+            return cart.reduce((count, item) => count + item.quantity, 0);
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                showNotification('❌ Корзина пуста');
+                return;
+            }
+
+            const cartData = {
+                items: cart.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity
+                })),
+                total: getCartTotal(),
+                timestamp: Date.now()
+            };
+
+            const cartString = JSON.stringify(cartData);
+            const encodedCart = btoa(unescape(encodeURIComponent(cartString)));
+
+            const botLink = `https://t.me/${BOT_USERNAME}?start=cart_${encodedCart}`;
+            
+            console.log('🔗 Ссылка на бота:', botLink);
+            
+            window.open(botLink, '_blank');
+            
+            showNotification('✅ Переход в бота для оформления заказа');
+        }
+
+        function renderToys() {
+            const grid = document.getElementById('productsGrid');
+            
+            let filteredToys = allToys;
+            
+            if (currentFilter !== 'all') {
+                filteredToys = allToys.filter(t => t.category === currentFilter);
+            }
+            
+            if (searchQuery) {
+                const query = searchQuery.toLowerCase();
+                filteredToys = filteredToys.filter(t => 
+                    t.name.toLowerCase().includes(query)
+                );
+            }
+
+            if (filteredToys.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 100px; background: white; border-radius: 30px;">
+                        <div style="font-size: 80px; margin-bottom: 20px;">🔍</div>
+                        <h3 style="font-size: 24px; color: #333;">Ничего не найдено</h3>
+                        <p style="color: #666;">Попробуйте изменить параметры поиска</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filteredToys.map(toy => {
+                const inCart = cart.find(item => item.id === toy.id);
+                const cartItem = inCart || { quantity: 0 };
+                
+                const images = toy.images && toy.images.length > 0 ? toy.images : ['placeholder.png'];
+                
+                return `
+                    <div class="product-card">
+                        ${inCart ? '<div class="in-cart-badge">✓ В корзине</div>' : ''}
+                        
+                        <div class="product-gallery">
+                            <div class="gallery-container" id="gallery-${toy.id}" data-current-index="0">
+                                ${images.map(img => `
+                                    <div class="gallery-slide">
+                                        <img src="toys/${toy.category === 'plush' ? 'plush' : 'simple'}/${encodeURIComponent(img)}" 
+                                             alt="${toy.name}"
+                                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\' viewBox=\'0 0 200 200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%23f8f0ff\'/%3E%3Ctext x=\'50\' y=\'120\' font-family=\'Arial\' font-size=\'14\' fill=\'%23666\'%3E${toy.name}%3C/text%3E%3C/svg%3E'">
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            ${images.length > 1 ? `
+                                <button class="gallery-arrow left" onclick="prevImage('${toy.id}', document.getElementById('gallery-${toy.id}').dataset.currentIndex)">←</button>
+                                <button class="gallery-arrow right" onclick="nextImage('${toy.id}', document.getElementById('gallery-${toy.id}').dataset.currentIndex)">→</button>
+                                <div class="gallery-nav">
+                                    ${images.map((_, i) => `
+                                        <span class="gallery-dot dot-${toy.id} ${i === 0 ? 'active' : ''}" 
+                                              onclick="goToSlide('${toy.id}', ${i})"></span>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="product-info">
+                            <span class="product-category">
+                                ${toy.category === 'plush' ? '🧸 Плюшевая' : '🎲 Обычная'}
+                            </span>
+                            <h3 class="product-name">${toy.name}</h3>
+                            <p class="product-description">${toy.description}</p>
+                            
+                            <div class="product-price-block">
+                                <span class="price-current">${toy.price} ₽</span>
+                            </div>
+                            
+                            <div class="product-actions">
+                                ${inCart ? `
+                                    <div class="quantity-control">
+                                        <button class="quantity-btn" onclick="updateQuantity('${toy.id}', -1)">−</button>
+                                        <span class="quantity-value">${cartItem.quantity}</span>
+                                        <button class="quantity-btn" onclick="updateQuantity('${toy.id}', 1)">+</button>
+                                    </div>
+                                    <button class="remove-from-cart-btn" onclick="removeFromCart('${toy.id}')">
+                                        🗑 Удалить
+                                    </button>
+                                ` : `
+                                    <button class="add-to-cart-btn" onclick="addToCart('${toy.id}')">
+                                        🛒 В корзину
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateCartDisplay() {
+            const count = getCartCount();
+            const total = getCartTotal();
+            
+            document.getElementById('cartCount').textContent = count;
+            document.getElementById('cartTotal').textContent = `${total} ₽`;
+            document.getElementById('cartTotalAmount').textContent = `${total} ₽`;
+            
+            const cartSection = document.getElementById('cartSection');
+            const cartItems = document.getElementById('cartItems');
+            
+            if (count === 0) {
+                cartSection.style.display = 'none';
+                return;
+            }
+            
+            cartSection.style.display = 'block';
+            
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <div class="cart-item-image">
+                            <img src="${item.image ? `toys/${item.category || 'plush'}/${item.image}` : 'placeholder.png'}" 
+                                 alt="${item.name}"
+                                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'50\' height=\'50\' viewBox=\'0 0 50 50\'%3E%3Crect width=\'50\' height=\'50\' fill=\'%23f8f0ff\'/%3E%3Ctext x=\'10\' y=\'30\' font-family=\'Arial\' font-size=\'10\' fill=\'%23666\'%3E${item.name}%3C/text%3E%3C/svg%3E'">
+                        </div>
+                        <div class="cart-item-details">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">${item.price} ₽</div>
+                        </div>
+                    </div>
+                    
+                    <div class="cart-item-quantity">
+                        <button class="quantity-btn" onclick="updateQuantity('${item.id}', -1)">−</button>
+                        <span class="quantity-value">${item.quantity}</span>
+                        <button class="quantity-btn" onclick="updateQuantity('${item.id}', 1)">+</button>
+                    </div>
+                    
+                    <div class="cart-item-total">
+                        ${item.price * item.quantity} ₽
+                    </div>
+                    
+                    <button class="cart-item-remove" onclick="removeFromCart('${item.id}')">
+                        ×
+                    </button>
+                </div>
+            `).join('');
+            
+            renderToys();
+        }
+
+        function toggleCart() {
+            const cartSection = document.getElementById('cartSection');
+            cartSection.style.display = cartSection.style.display === 'none' ? 'block' : 'none';
+            
+            if (cartSection.style.display === 'block') {
+                cartSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function filterToys(category) {
+            currentFilter = category;
+            
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderToys();
+        }
+
+        function searchToys() {
+            searchQuery = document.getElementById('searchInput').value;
+            renderToys();
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadToys();
+            
+            if (getCartCount() > 0) {
+                document.getElementById('cartSection').style.display = 'block';
+            }
         });
     </script>
 </body>
