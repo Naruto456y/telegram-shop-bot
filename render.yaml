@@ -2,9 +2,6 @@ services:
   - type: web
     name: telegram-shop-bot
     runtime: python
+    plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: python bot.py
-    healthCheckPath: /healthcheck
-    envVars:
-      - key: TOKEN
-        value: "7989661243:AAFZpemxdz9Hy1WEUhW5_p6-lbAHWDj22T8"
+    startCommand: ./start.sh
