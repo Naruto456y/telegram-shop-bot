@@ -259,11 +259,32 @@ def get_main_keyboard():
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
+async def get_logs(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Команда для получения логов (только для админа)"""
+    user = update.effective_user
+    if user.id not in ADMIN_IDS:
+        await update.message.reply_text("⛔ Нет доступа")
+        return
+    
+    try:
+        with open('/tmp/bot_debug.log', 'r') as f:
+            logs = f.read()
+        if logs:
+            # Отправляем последние 2000 символов
+            await update.message.reply_text(f"📋 Логи:\n```\n{logs[-2000:]}\n```", parse_mode='Markdown')
+        else:
+            await update.message.reply_text("📋 Логи пусты")
+    except Exception as e:
+        await update.message.reply_text(f"❌ Ошибка чтения логов: {e}")
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработчик команды /start - принимает корзину с сайта"""
-    print(f"\n🔥🔥🔥 START ВЫЗВАН 🔥🔥🔥")
-    print(f"🔥 User: {update.effective_user.first_name} (ID: {update.effective_user.id})")
-    print(f"🔥 Args: {context.args}")
+    # ПРИНУДИТЕЛЬНАЯ ЗАПИСЬ В ФАЙЛ
+    with open('/tmp/bot_debug.log', 'a') as f:
+        f.write(f"\n🔥🔥🔥 START ВЫЗВАН {datetime.now()}\n")
+        f.write(f"🔥 User: {update.effective_user.first_name} (ID: {update.effective_user.id})\n")
+        f.write(f"🔥 Args: {context.args}\n")
+        f.write(f"🔥 Полное сообщение: {update.message.text if update.message else 'Нет сообщения'}\n")
     
     user = update.effective_user
     update_user_info(user)
@@ -272,16 +293,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     cart_data = None
     
     if args and len(args) > 0:
-        print(f"🔥 Первый аргумент: {args[0][:100]}...")
+        with open('/tmp/bot_debug.log', 'a') as f:
+            f.write(f"🔥 Первый аргумент: {args[0][:100]}...\n")
         cart_data = decode_cart_data(args[0])
-        print(f"🔥 Результат декодирования: {cart_data}")
+        with open('/tmp/bot_debug.log', 'a') as f:
+            f.write(f"🔥 Результат декодирования: {cart_data}\n")
     
     if cart_data:
-        # Сохраняем корзину для этого пользователя
         pending_carts[user.id] = cart_data
-        print(f"🔥 Корзина сохранена. Всего корзин: {len(pending_carts)}")
+        with open('/tmp/bot_debug.log', 'a') as f:
+            f.write(f"🔥 Корзина сохранена. Всего корзин: {len(pending_carts)}\n")
         
-        # Показываем корзину и предлагаем оформить
         items_text = "\n".join([f"• {item['name']} x{item['quantity']} - {item['price'] * item['quantity']} руб" 
                                for item in cart_data['items']])
         
@@ -296,10 +318,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 [InlineKeyboardButton("🚚 Доставка курьером", callback_data="delivery_courier")]
             ])
         )
-        print(f"🔥 Сообщение с корзиной отправлено пользователю")
+        with open('/tmp/bot_debug.log', 'a') as f:
+            f.write(f"🔥 Сообщение с корзиной отправлено пользователю\n")
     else:
-        # Обычный запуск без корзины
-        print(f"🔥 Обычный start без корзины")
+        with open('/tmp/bot_debug.log', 'a') as f:
+            f.write(f"🔥 Обычный start без корзины\n")
         await update.message.reply_text(
             "Добро пожаловать!\n\n"
             "🛍 Для заказа игрушек посетите наш сайт:\n"
@@ -307,7 +330,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "🔐 Для админов: /admin",
             reply_markup=get_main_keyboard()
         )
-    print(f"🔥🔥🔥 КОНЕЦ START 🔥🔥🔥\n")
+    with open('/tmp/bot_debug.log', 'a') as f:
+        f.write(f"🔥🔥🔥 КОНЕЦ START {datetime.now()}\n\n")
 
 # ======================== АДМИН ПАНЕЛЬ ========================
 async def admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -769,6 +793,8 @@ def main():
     
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
+    app.add_handler(CommandHandler("logs", get_logs))
+
     print("\n🔍 ПРОВЕРКА БОТА:")
     print("✅ Бот запущен на RENDER...")
     print("✅ Режим: WEBHOOK (для Render)")
