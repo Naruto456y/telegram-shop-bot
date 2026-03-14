@@ -245,7 +245,7 @@ if __name__ == "__main__":
     app.add_handler(CallbackQueryHandler(button_callback))
     
     PORT = int(os.environ.get('PORT', 10000))
-    WEBHOOK_URL = f"https://telegram-shop-bot.onrender.com/{TOKEN}"
+    WEBHOOK_URL = f"https://telegram-shop-bot.onrender.com/{TOKEN}"  
     
     logger.info(f"🚀 Запуск бота на порту {PORT}")
     logger.info(f"🔗 Webhook URL: {WEBHOOK_URL}")
