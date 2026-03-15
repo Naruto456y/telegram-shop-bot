@@ -237,25 +237,40 @@ async def process_order(query, context, delivery_type, address):
 
 # ======================== ЗАПУСК ========================
 if __name__ == "__main__":
+    # Загружаем данные
     load_data()
     
+    # Создаем приложение
     app = Application.builder().token(TOKEN).build()
     
+    # Добавляем обработчики
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(button_callback))
+    app.add_handler(CallbackQueryHandler(button_callback, pattern="^delivery_.*|^confirm_.*"))
+    app.add_handler(CallbackQueryHandler(admin_callback, pattern="^admin_.*"))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
+    # Настройка для Render
     PORT = int(os.environ.get('PORT', 10000))
-    WEBHOOK_URL = f"https://telegram-shop-bot.onrender.com/{TOKEN}"  
     
-    logger.info(f"🚀 Запуск бота на порту {PORT}")
-    logger.info(f"🔗 Webhook URL: {WEBHOOK_URL}")
-
+    # Для Python 3.14+ нужно создать event loop
     import asyncio
-    asyncio.set_event_loop(asyncio.new_event_loop())
+    import nest_asyncio
     
+    # Применяем nest_asyncio для возможности вложенных циклов
+    nest_asyncio.apply()
+    
+    # Создаем новый event loop
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    
+    # Запускаем бота
+    logger.info(f"🚀 Запуск бота на порту {PORT}")
+    logger.info(f"🔗 Webhook URL: https://telegram-shop-bot.onrender.com/{TOKEN}")
+    
+    # Запускаем вебхук
     app.run_webhook(
         listen="0.0.0.0",
         port=PORT,
         url_path=TOKEN,
-        webhook_url=WEBHOOK_URL
+        webhook_url=f"https://telegram-shop-bot.onrender.com/{TOKEN}"
     )
