@@ -352,7 +352,7 @@ if __name__ == "__main__":
     
     # Добавляем обработчики
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("admin", admin_panel))  # Добавили команду /admin
+    app.add_handler(CommandHandler("admin", admin_panel))
     app.add_handler(CallbackQueryHandler(button_callback, pattern="^(delivery_.*|confirm_delivery)$"))
     app.add_handler(CallbackQueryHandler(admin_callback, pattern="^admin_.*"))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
@@ -360,13 +360,16 @@ if __name__ == "__main__":
     # Настройка для Render
     PORT = int(os.environ.get('PORT', 10000))
     
-    logger.info(f"🚀 Запуск бота на порту {PORT}")
-    logger.info(f"🔗 Webhook URL: https://telegram-shop-bot.onrender.com/{TOKEN}")
+    logger.info(f"🚀 Запуск бота в режиме POLLING на порту {PORT}")
     
-    # Запускаем вебхук (для Render)
-    app.run_webhook(
-        listen="0.0.0.0",
-        port=PORT,
-        url_path=TOKEN,
-        webhook_url=f"https://telegram-shop-bot.onrender.com/{TOKEN}"
-    )
+    # СОЗДАЕМ EVENT LOOP
+    import asyncio
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    
+    # Запускаем бота в режиме polling (вместо webhook)
+    print("✅ Бот запущен и готов к работе!")
+    print("📱 Откройте Telegram и отправьте /start")
+    
+    # Используем run_polling вместо run_webhook
+    app.run_polling()
