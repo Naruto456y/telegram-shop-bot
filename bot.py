@@ -344,32 +344,32 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ======================== ЗАПУСК ========================
 if __name__ == "__main__":
-    # Загружаем данные
     load_data()
     
-    # Создаем приложение
     app = Application.builder().token(TOKEN).build()
     
     # Добавляем обработчики
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("admin", admin_panel))
-    app.add_handler(CallbackQueryHandler(button_callback, pattern="^(delivery_.*|confirm_delivery)$"))
+    app.add_handler(CallbackQueryHandler(button_callback, pattern="^delivery_.*|^confirm_.*"))
     app.add_handler(CallbackQueryHandler(admin_callback, pattern="^admin_.*"))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
-    # Настройка для Render
+    # Для Render используем WEBHOOK
     PORT = int(os.environ.get('PORT', 10000))
     
-    logger.info(f"🚀 Запуск бота в режиме POLLING на порту {PORT}")
-    
-    # СОЗДАЕМ EVENT LOOP
+    # ВАЖНО: Удаляем старый webhook перед запуском
     import asyncio
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
+    async def setup_webhook():
+        await app.bot.delete_webhook()
+        await app.bot.set_webhook(url=f"https://telegram-shop-bot.onrender.com/{TOKEN}")
     
-    # Запускаем бота в режиме polling (вместо webhook)
-    print("✅ Бот запущен и готов к работе!")
-    print("📱 Откройте Telegram и отправьте /start")
+    asyncio.run(setup_webhook())
     
-    # Используем run_polling вместо run_webhook
-    app.run_polling()
+    logger.info(f"🚀 Запуск бота в режиме WEBHOOK на порту {PORT}")
+    
+    app.run_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        url_path=TOKEN,
+        webhook_url=f"https://telegram-shop-bot.onrender.com/{TOKEN}"
+    )
