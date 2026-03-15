@@ -1,25 +1,25 @@
 import logging
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
-import requests
 import json
 import os
-import asyncio
 from datetime import datetime
-from collections import defaultdict
 import pickle
 import threading
 import time
 import base64
-import re
 import sys
 import io
 
 # ======================== КОНФИГУРАЦИЯ ========================
 ADMIN_IDS = [8095346561, 8163619171]
-USER_ID = 8095346561
-SECOND_ADMIN_ID = 8163619171
-TOKEN = os.environ.get('TOKEN', "7989661243:AAFZpemxdz9Hy1WEUhW5_p6-lbAHWDj22T8")
+# Токен берется из переменных окружения (обязательно добавьте на Render!)
+TOKEN = os.environ.get('TOKEN')
+if not TOKEN:
+    # На случай локального тестирования, но для Render ТОЧНО нужно добавить в переменные окружения
+    TOKEN = "7989661243:AAFZpemxdz9Hy1WEUhW5_p6-lbAHWDj22T8"
+    print("⚠️ ВНИМАНИЕ: Токен взят из кода. Для продакшена на Render добавьте TOKEN в Environment Variables!")
+
 DATA_FILE = 'bot_data.pickle'
 BACKUP_INTERVAL = 60
 ADMIN_PASSWORD = "1478963"
@@ -100,6 +100,20 @@ def decode_cart_data(encoded_data):
         logger.error(f"❌ Ошибка декодирования корзины: {e}")
         return None
 
+# ======================== ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ АДМИНКИ ========================
+async def show_admin_menu(message):
+    """Показывает главное меню админ-панели"""
+    keyboard = [
+        [InlineKeyboardButton("📊 Статистика", callback_data="admin_stats")],
+        [InlineKeyboardButton("👥 Пользователи", callback_data="admin_users")],
+        [InlineKeyboardButton("🛒 Заказы", callback_data="admin_orders")],
+        [InlineKeyboardButton("💾 Сохранить", callback_data="admin_save")]
+    ]
+    await message.reply_text(
+        "🔐 АДМИН-ПАНЕЛЬ\n\nВыберите действие:",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
 # ======================== ОБРАБОТЧИКИ КОМАНД ========================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработчик команды /start"""
@@ -155,6 +169,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     )
 
+async def admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Обработчик команды /admin или кнопки 'Админ-панель'"""
+    user = update.effective_user
+    
+    if user.id in ADMIN_IDS:
+        await show_admin_menu(update.message)
+    else:
+        context.user_data['awaiting_admin_password'] = True
+        await update.message.reply_text("🔐 Введите пароль для доступа к админ-панели:")
+
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработчик нажатий на инлайн-кнопки"""
     query = update.callback_query
@@ -201,12 +225,13 @@ async def process_order(query, context, delivery_type, address):
     }
     
     orders_db.append(order)
-    users_db[user_id]["orders_count"] += 1
+    if user_id in users_db:
+        users_db[user_id]["orders_count"] += 1
     save_data()
     
     # Уведомление админам
     admin_text = f"🛒 НОВЫЙ ЗАКАЗ!\n\n"
-    admin_text += f"👤 Покупатель: {users_db[user_id]['first_name']} (@{users_db[user_id]['username']})\n"
+    admin_text += f"👤 Покупатель: {users_db.get(user_id, {}).get('first_name', 'Неизвестно')} (@{users_db.get(user_id, {}).get('username', 'нет')})\n"
     if address:
         admin_text += f"📍 Адрес: {address}\n"
     admin_text += f"\n📦 Товары:\n"
@@ -217,8 +242,8 @@ async def process_order(query, context, delivery_type, address):
     for admin_id in ADMIN_IDS:
         try:
             await context.bot.send_message(admin_id, admin_text)
-        except:
-            pass
+        except Exception as e:
+            logger.error(f"Не удалось отправить уведомление админу {admin_id}: {e}")
     
     # Ответ пользователю
     user_text = "✅ Заказ оформлен!\n\n"
@@ -244,13 +269,22 @@ async def admin_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = query.data
     
     if data == "admin_stats":
-        text = f"📊 Статистика\n\n👥 Пользователей: {len(users_db)}\n🛒 Заказов: {len(orders_db)}"
+        total_users = len(users_db)
+        total_orders = len(orders_db)
+        total_sum = sum(o['total'] for o in orders_db)
+        text = (f"📊 Статистика\n\n"
+                f"👥 Пользователей: {total_users}\n"
+                f"🛒 Заказов: {total_orders}\n"
+                f"💰 Сумма заказов: {total_sum} руб")
         await query.edit_message_text(text)
     
     elif data == "admin_users":
+        if not users_db:
+            await query.edit_message_text("👥 Пользователей пока нет")
+            return
         text = "👥 Последние пользователи:\n"
         for uid, info in list(users_db.items())[-5:]:
-            text += f"\n• {info['first_name']} - заказов: {info['orders_count']}"
+            text += f"\n• {info['first_name']} (@{info['username']}) - заказов: {info['orders_count']}"
         await query.edit_message_text(text)
     
     elif data == "admin_orders":
@@ -259,14 +293,54 @@ async def admin_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         text = "🛒 Последние заказы:\n"
         for order in orders_db[-5:]:
-            text += f"\n• {order['date'][:10]} - {order['total']} руб"
+            text += f"\n• {order['date'][:10]} - {order['total']} руб - {order['delivery_type']}"
         await query.edit_message_text(text)
     
     elif data == "admin_save":
         if save_data():
             await query.edit_message_text("✅ Данные сохранены")
         else:
-            await query.edit_message_text("❌ Ошибка")
+            await query.edit_message_text("❌ Ошибка при сохранении")
+
+# ======================== ОБРАБОТКА ТЕКСТОВЫХ СООБЩЕНИЙ ========================
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Обработчик текстовых сообщений (не команд)"""
+    user = update.effective_user
+    text = update.message.text
+    
+    # Проверка пароля для админ-панели
+    if context.user_data.get('awaiting_admin_password'):
+        if text == ADMIN_PASSWORD:
+            context.user_data['admin_authenticated'] = True
+            context.user_data['awaiting_admin_password'] = False
+            await show_admin_menu(update.message)
+        else:
+            await update.message.reply_text("❌ Неверный пароль.")
+        return
+    
+    # Ожидание адреса для доставки
+    if context.user_data.get('awaiting_address'):
+        context.user_data['temp_address'] = text
+        context.user_data['awaiting_address'] = False
+        
+        await update.message.reply_text(
+            f"📍 Подтверждение адреса:\n\n{text}\n\nВсё верно?",
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("✅ Да, оформить заказ", callback_data="confirm_delivery")],
+                [InlineKeyboardButton("🔄 Ввести заново", callback_data="delivery_courier")]
+            ])
+        )
+        return
+    
+    # Кнопка админ-панели (если не в режиме ожидания)
+    if text == "🔐 Админ-панель":
+        await admin_panel(update, context)
+        return
+    
+    # Любое другое сообщение
+    await update.message.reply_text(
+        "Я вас не понимаю. Используйте кнопки меню или команду /start"
+    )
 
 # ======================== ЗАПУСК ========================
 if __name__ == "__main__":
@@ -278,29 +352,18 @@ if __name__ == "__main__":
     
     # Добавляем обработчики
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(button_callback, pattern="^delivery_.*|^confirm_.*"))
+    app.add_handler(CommandHandler("admin", admin_panel))  # Добавили команду /admin
+    app.add_handler(CallbackQueryHandler(button_callback, pattern="^(delivery_.*|confirm_delivery)$"))
     app.add_handler(CallbackQueryHandler(admin_callback, pattern="^admin_.*"))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
     # Настройка для Render
     PORT = int(os.environ.get('PORT', 10000))
     
-    # Для Python 3.14+ нужно создать event loop
-    import asyncio
-    import nest_asyncio
-    
-    # Применяем nest_asyncio для возможности вложенных циклов
-    nest_asyncio.apply()
-    
-    # Создаем новый event loop
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    
-    # Запускаем бота
     logger.info(f"🚀 Запуск бота на порту {PORT}")
     logger.info(f"🔗 Webhook URL: https://telegram-shop-bot.onrender.com/{TOKEN}")
     
-    # Запускаем вебхук
+    # Запускаем вебхук (для Render)
     app.run_webhook(
         listen="0.0.0.0",
         port=PORT,
