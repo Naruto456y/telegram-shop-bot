@@ -4,4 +4,17 @@ services:
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: ./render-start.sh
+    startCommand: python bot.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+  - type: web
+    name: telegram-shop-site
+    runtime: static
+    plan: free
+    buildCommand: echo "Static site, no build needed"
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
