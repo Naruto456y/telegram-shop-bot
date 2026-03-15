@@ -235,6 +235,39 @@ async def process_order(query, context, delivery_type, address):
         ])
     )
 
+# ======================== АДМИН-ПАНЕЛЬ (callback) ========================
+async def admin_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Обработчик кнопок админ-панели"""
+    query = update.callback_query
+    await query.answer()
+    
+    data = query.data
+    
+    if data == "admin_stats":
+        text = f"📊 Статистика\n\n👥 Пользователей: {len(users_db)}\n🛒 Заказов: {len(orders_db)}"
+        await query.edit_message_text(text)
+    
+    elif data == "admin_users":
+        text = "👥 Последние пользователи:\n"
+        for uid, info in list(users_db.items())[-5:]:
+            text += f"\n• {info['first_name']} - заказов: {info['orders_count']}"
+        await query.edit_message_text(text)
+    
+    elif data == "admin_orders":
+        if not orders_db:
+            await query.edit_message_text("🛒 Заказов нет")
+            return
+        text = "🛒 Последние заказы:\n"
+        for order in orders_db[-5:]:
+            text += f"\n• {order['date'][:10]} - {order['total']} руб"
+        await query.edit_message_text(text)
+    
+    elif data == "admin_save":
+        if save_data():
+            await query.edit_message_text("✅ Данные сохранены")
+        else:
+            await query.edit_message_text("❌ Ошибка")
+
 # ======================== ЗАПУСК ========================
 if __name__ == "__main__":
     # Загружаем данные
