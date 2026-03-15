@@ -249,6 +249,9 @@ if __name__ == "__main__":
     
     logger.info(f"🚀 Запуск бота на порту {PORT}")
     logger.info(f"🔗 Webhook URL: {WEBHOOK_URL}")
+
+    import asyncio
+    asyncio.set_event_loop(asyncio.new_event_loop())
     
     app.run_webhook(
         listen="0.0.0.0",
