@@ -4,4 +4,4 @@ services:
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: ./start.sh
+    startCommand: ./render-start.sh
