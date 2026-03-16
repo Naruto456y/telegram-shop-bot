@@ -344,34 +344,40 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Я вас не понимаю. Используйте кнопки меню или команду /start"
     )
 
-# ======================== ЗАПУСК ========================
-if __name__ == "__main__":
+# ======================== ЗАПУСК (ДЛЯ RENDER) ========================
+def main():
     load_data()
     
     app = Application.builder().token(TOKEN).build()
     
-    # Добавляем обработчики
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(button_callback, pattern="^delivery_.*|^confirm_.*"))
-    app.add_handler(CallbackQueryHandler(admin_callback, pattern="^admin_.*"))
+    app.add_handler(CommandHandler("admin", admin_panel))
+    app.add_handler(CommandHandler("logs", get_logs))
+    
+    app.add_handler(CallbackQueryHandler(admin_callback, pattern="^admin_.*|^user_.*|^order_.*|^delete_order_.*"))
+    app.add_handler(CallbackQueryHandler(button_callback))
+    
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
-    # Для Render используем WEBHOOK
+    print("\n🔍 ПРОВЕРКА БОТА:")
+    print("✅ Бот готов к запуску на RENDER...")
+    print(f"👥 Пользователей: {len(users_db)}")
+    print(f"📦 Заказов: {len(orders_db)}")
+    
+    # Для Render используем webhook
     PORT = int(os.environ.get('PORT', 10000))
+    print(f"🌐 Запускаем webhook на порту {PORT}")
     
-    # ВАЖНО: Удаляем старый webhook перед запуском
-    import asyncio
-    async def setup_webhook():
-        await app.bot.delete_webhook()
-        await app.bot.set_webhook(url=f"https://telegram-shop-bot.onrender.com/{TOKEN}")
-    
-    asyncio.run(setup_webhook())
-    
-    logger.info(f"🚀 Запуск бота в режиме WEBHOOK на порту {PORT}")
-    
+    # Запуск webhook
     app.run_webhook(
         listen="0.0.0.0",
         port=PORT,
         url_path=TOKEN,
         webhook_url=f"https://telegram-shop-bot.onrender.com/{TOKEN}"
     )
+
+if __name__ == "__main__":
+    # Добавляем nest_asyncio для совместимости с Render
+    import nest_asyncio
+    nest_asyncio.apply()
+    main()
