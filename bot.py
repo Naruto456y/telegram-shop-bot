@@ -10,6 +10,8 @@ import time
 import base64
 import sys
 import io
+import nest_asyncio
+nest_asyncio.apply()
 
 # ======================== КОНФИГУРАЦИЯ ========================
 ADMIN_IDS = [8095346561, 8163619171]
