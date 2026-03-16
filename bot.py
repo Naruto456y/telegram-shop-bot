@@ -85,6 +85,24 @@ def auto_save():
 save_thread = threading.Thread(target=auto_save, daemon=True)
 save_thread.start()
 
+async def get_logs(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Команда для получения логов (только для админов)"""
+    user = update.effective_user
+    if user.id not in ADMIN_IDS:
+        await update.message.reply_text("⛔ Нет доступа")
+        return
+    
+    try:
+        with open('bot.log', 'r') as f:
+            logs = f.read()
+        if logs:
+            # Отправляем последние 2000 символов
+            await update.message.reply_text(f"📋 Логи:\n```\n{logs[-2000:]}\n```", parse_mode='Markdown')
+        else:
+            await update.message.reply_text("📋 Логи пусты")
+    except Exception as e:
+        await update.message.reply_text(f"❌ Ошибка чтения логов: {e}")
+
 # ======================== ДЕКОДИРОВАНИЕ КОРЗИНЫ ========================
 def decode_cart_data(encoded_data):
     """Декодирует данные корзины из параметра start"""
