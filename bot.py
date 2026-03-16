@@ -345,39 +345,36 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # ======================== ЗАПУСК (ДЛЯ RENDER) ========================
-def main():
-    load_data()
-    
-    app = Application.builder().token(TOKEN).build()
-    
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("admin", admin_panel))
-    app.add_handler(CommandHandler("logs", get_logs))
-    
-    app.add_handler(CallbackQueryHandler(admin_callback, pattern="^admin_.*|^user_.*|^order_.*|^delete_order_.*"))
-    app.add_handler(CallbackQueryHandler(button_callback))
-    
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    
-    print("\n🔍 ПРОВЕРКА БОТА:")
-    print("✅ Бот готов к запуску на RENDER...")
-    print(f"👥 Пользователей: {len(users_db)}")
-    print(f"📦 Заказов: {len(orders_db)}")
-    
-    # Для Render используем webhook
-    PORT = int(os.environ.get('PORT', 10000))
-    print(f"🌐 Запускаем webhook на порту {PORT}")
-    
-    # Запуск webhook
-    app.run_webhook(
-        listen="0.0.0.0",
-        port=PORT,
-        url_path=TOKEN,
-        webhook_url=f"https://telegram-shop-bot.onrender.com/{TOKEN}"
-    )
-
 if __name__ == "__main__":
-    # Добавляем nest_asyncio для совместимости с Render
+    # 1. Применяем nest_asyncio для решения проблемы с event loop
     import nest_asyncio
     nest_asyncio.apply()
-    main()
+    
+    # 2. Загружаем данные
+    load_data()
+    
+    # 3. Строим приложение
+    application = Application.builder().token(TOKEN).build()
+    
+    # 4. Добавляем все обработчики (они у вас уже есть в коде выше)
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("admin", admin_panel))
+    application.add_handler(CommandHandler("logs", get_logs))
+    application.add_handler(CallbackQueryHandler(admin_callback, pattern="^admin_.*|^user_.*|^order_.*|^delete_order_.*"))
+    application.add_handler(CallbackQueryHandler(button_callback))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    
+    # 5. Настройки для Render
+    PORT = int(os.environ.get('PORT', 10000))
+    print(f"\n🔍 ПРОВЕРКА БОТА:")
+    print(f"✅ Бот готов к запуску на RENDER...")
+    print(f"👥 Пользователей: {len(users_db)}")
+    print(f"📦 Заказов: {len(orders_db)}")
+    print(f"🌐 Запускаем webhook на порту {PORT}")
+    
+    # 6. ПРАВИЛЬНЫЙ ЗАПУСК WEBHOOK (без listen)
+    application.run_webhook(
+        webhook_url=f"https://telegram-shop-bot.onrender.com/{TOKEN}",
+        port=PORT,
+        secret_token=None  # Можно добавить для безопасности, но не обязательно
+    )
