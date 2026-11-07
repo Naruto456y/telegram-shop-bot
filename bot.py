@@ -1,7 +1,7 @@
 import logging
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
-import requests
+from dotenv import load_dotenv
 import json
 import os
 import asyncio
@@ -12,14 +12,16 @@ import threading
 import time
 
 # ======================== КОНФИГУРАЦИЯ ========================
-ADMIN_IDS = [111111111]  # Список админов (ваш ID)
-USER_ID = 111111111      # Ваш ID (админ)
-TOKEN = "YOUR_BOT_TOKEN"
+# Все настройки берутся из переменных окружения или файла .env (см. .env.example)
+load_dotenv()
+TOKEN = os.environ["BOT_TOKEN"]
+ADMIN_IDS = [int(x) for x in os.environ.get("ADMIN_IDS", "").split(",") if x.strip()]
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")      # пароль для входа в /admin
+PICKUP_ADDRESS = os.environ.get("PICKUP_ADDRESS", "по договорённости")
+SUPPORT_CONTACT = os.environ.get("SUPPORT_CONTACT", "")    # например @username
+WEBHOOK_URL = os.environ.get("WEBHOOK_URL", "")            # пусто: бот работает через polling
 DATA_FILE = 'bot_data.pickle'
 BACKUP_INTERVAL = 60
-
-# Пароль для доступа к админ-панели
-ADMIN_PASSWORD = "CHANGE_ME"
 
 # ======================== СТРУКТУРЫ ДАННЫХ ========================
 carts = {}                # Корзины пользователей
@@ -83,6 +85,7 @@ logging.basicConfig(
     handlers=[file_handler, console_handler]
 )
 
+logging.getLogger("httpx").setLevel(logging.WARNING)  # иначе в логах виден URL с токеном
 logger = logging.getLogger(__name__)
 
 # ======================== СИСТЕМА СОХРАНЕНИЯ ДАННЫХ ========================
@@ -128,17 +131,13 @@ save_thread = threading.Thread(target=auto_save, daemon=True)
 save_thread.start()
 
 # ======================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ========================
-def send_message(text):
-    try:
-        url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-        params = {
-            "chat_id": USER_ID,
-            "text": text,
-            "parse_mode": "HTML"
-        }
-        requests.get(url, params=params)
-    except Exception as e:
-        logger.error(f"Ошибка отправки сообщения админу: {e}")
+async def notify_admins(bot, text):
+    """Отправляет уведомление всем админам из ADMIN_IDS"""
+    for admin_id in ADMIN_IDS:
+        try:
+            await bot.send_message(chat_id=admin_id, text=text, parse_mode="HTML")
+        except Exception as e:
+            logger.error(f"Ошибка отправки сообщения админу {admin_id}: {e}")
 
 def update_user_info(user):
     user_id = user.id
@@ -826,13 +825,13 @@ async def show_cart(query, context):
 
 async def show_delivery_options(query, context):
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🚶 Самовывоз (наш район)", callback_data="delivery_pickup")],
+        [InlineKeyboardButton("🚶 Самовывоз", callback_data="delivery_pickup")],
         [InlineKeyboardButton("◀️ Назад в корзину", callback_data="view_cart")]
     ])
     
     await query.edit_message_text(
         "📦 <b>Выберите способ получения</b>\n\n"
-        "🚶 <b>Самовывоз:</b> наш район (бесплатно)\n\n"
+        f"🚶 <b>Самовывоз:</b> {PICKUP_ADDRESS} (бесплатно)\n\n"
         "👇 Сделайте выбор:",
         parse_mode='HTML',
         reply_markup=keyboard
@@ -884,8 +883,7 @@ async def process_order(query, context, delivery_type):
     order_text += f"📦 Способ: Самовывоз\n"
     order_text += f"💰 Сумма: {total} руб\n"
     
-    await context.bot.send_message(chat_id=USER_ID, text=order_text, parse_mode='HTML')
-    await context.bot.send_message(chat_id=222222222, text=order_text, parse_mode='HTML')
+    await notify_admins(context.bot, order_text)
     
     # Очищаем корзину
     if user_id in carts:
@@ -895,7 +893,7 @@ async def process_order(query, context, delivery_type):
     
     await query.edit_message_text(
         f"✅ <b>Заказ успешно оформлен!</b>\n\n"
-        f"Способ получения: Самовывоз (наш район)\n"
+        f"Способ получения: Самовывоз ({PICKUP_ADDRESS})\n"
         f"Сумма: {total} руб\n\n"
         f"📞 Администратор свяжется с вами.",
         parse_mode='HTML',
@@ -916,14 +914,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     update_user_info(user)
     
     await update.message.reply_text(
-        "Привет! Я бот для покупки игрушек в нашем районе.\n"
+        "Привет! Я бот магазина игрушек.\n"
         "Выберите ниже что вы хотите купить:",
         reply_markup=get_main_keyboard()
     )
     
     if user.id not in users_db or users_db[user.id]["first_seen"] == users_db[user.id]["last_active"]:
         username = f"@{user.username}" if user.username else "без username"
-        send_message(f"🆕 Новый пользователь: {user.first_name} ({username}, ID: {user.id})")
+        await notify_admins(context.bot, f"🆕 Новый пользователь: {user.first_name} ({username}, ID: {user.id})")
 
 async def get_toys_plush(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = read_info_plush()
@@ -987,8 +985,7 @@ async def support(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await update.message.reply_text(
         "🛠 Техническая поддержка:\n"
-        "• По вопросам заказа и по работе бота: @Yusuf_Guseinov\n"
-        "• Сайт бота: https://naruto456y.github.io",
+        f"• По вопросам заказа и работе бота: {SUPPORT_CONTACT or 'напишите администратору'}",
         reply_markup=reply_markup
     )
 
@@ -1186,7 +1183,11 @@ def main():
         print(f"❌ {simple_file} - НЕ НАЙДЕН!")
     
     print(f"\n🚀 Бот запущен... Данные загружены. Пользователей: {len(users_db)}")
-    app.run_polling()
+    if WEBHOOK_URL:  # хостинг (Render и т.п.): Telegram сам присылает обновления
+        app.run_webhook(listen="0.0.0.0", port=int(os.environ.get("PORT", 10000)), url_path="webhook",
+                        webhook_url=f"{WEBHOOK_URL.rstrip('/')}/webhook")
+    else:            # локально: бот сам опрашивает Telegram
+        app.run_polling()
 
 if __name__ == "__main__":
     main()
